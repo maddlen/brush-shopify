@@ -1,18 +1,14 @@
 import Cookies from "js-cookie";
 
-const makeLoginRedirectUrl = (path?: string): string => {
-  let returnTo = path || "";
-  if (path === "") {
-    const url = new URL(window.location.href);
-    returnTo = `${url.pathname}${url.search}`;
-  }
-
-  returnTo = `${Shopify.routes.root}${returnTo}`.replace("//", "/");
-  const redirectPath = `/customer_authentication/login?return_to=${encodeURIComponent(returnTo)}`;
+const makeLoginRedirectUrl = (path = ""): string => {
   const currentUrl = new URL(window.location.href);
+  const basePath = Shopify.routes.root.replace(/\/$/, "");
+  const returnPath = path || `${currentUrl.pathname}${currentUrl.search}`.replace(basePath, "");
+  const returnTo = `${basePath}/${returnPath}`.replace(/\/{2,}/g, "/");
 
-  return `${currentUrl.origin}${redirectPath}`;
+  return `${currentUrl.origin}/customer_authentication/login?return_to=${encodeURIComponent(returnTo)}`;
 };
+
 
 class Referrer {
   cookieName = "brush_referrer";
