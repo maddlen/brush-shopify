@@ -1,25 +1,39 @@
 import i18next from "i18next";
 
-const init = async () => {
-  const key = `brush-i18n-${Shopify.locale}`;
-  let translations =
-    (!Brush.App.version.isNew && localStorage.getItem(key)) || (await ggtFetch(`/apps/brush/i18n`));
+const STORAGE_PREFIX = "brush-i18n";
 
-  const parsed = typeof translations === "string" ? JSON.parse(translations) : translations || {};
+const init = async (): Promise<void> => {
+  const { locale } = Shopify;
+  const key = `${STORAGE_PREFIX}-${locale}`;
+  let translations: Record<string, any> = {};
+
+  try {
+    const cached = localStorage.getItem(key);
+    if (!Brush.App.version.isNew && cached) {
+      translations = JSON.parse(cached);
+    } else {
+      const response = await ggtFetch(`/apps/brush/i18n`);
+      translations = typeof response === "string" ? JSON.parse(response) : response || {};
+      localStorage.setItem(key, JSON.stringify(translations));
+    }
+  } catch (error) {
+    console.error("Failed to load translations:", error);
+    translations = {};
+  }
 
   await i18next.init({
-    lng: Shopify.locale,
-    resources: { [Shopify.locale]: { translation: parsed } },
+    lng: locale,
+    resources: { [locale]: { translation: translations } },
   });
 
-  localStorage.setItem(key, JSON.stringify(parsed));
-  window.$t = i18next.t;
+  window.$t = i18next.t.bind(i18next);
 };
 
 const formatPrice = (value: number): string => {
-  return new Intl.NumberFormat(`${Shopify.locale}-${Shopify.country}`, {
+  const { locale, country, currency } = Shopify;
+  return new Intl.NumberFormat(`${locale}-${country}`, {
     style: "currency",
-    currency: Shopify.currency.active,
+    currency: currency.active,
   }).format(value);
 };
 

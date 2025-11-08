@@ -1,18 +1,33 @@
 import Cookies from "js-cookie";
 
 const COOKIE_NAME = "brush_version";
+const SCRIPT_IDENTIFIER = 'script[src*="brush.js"]';
 
-const checkAppVersion = () => {
-  const script = document.querySelector<HTMLScriptElement>('script[src*="brush.js"]');
-  if (!script) return;
+const getBrushVersion = (): string | null => {
+  const script = document.querySelector<HTMLScriptElement>(SCRIPT_IDENTIFIER);
+  if (!script) return null;
 
-  const url = new URL(script.src, window.location.origin);
-  const version = url.searchParams.get("v") || "";
-  const cookieVersion = Cookies.get(COOKIE_NAME) || "";
-  const isNew = version !== cookieVersion;
+  try {
+    const version = new URL(script.src, window.location.origin).searchParams.get("v");
+    return version || null;
+  } catch {
+    return null;
+  }
+};
 
-  Brush.App.version = { id: version, isNew };
-  Cookies.set(COOKIE_NAME, version);
+const checkAppVersion = (): void => {
+  const version = getBrushVersion();
+  if (!version) return;
+
+  const previousVersion = Cookies.get(COOKIE_NAME);
+  const isNew = version !== previousVersion;
+
+  // Ensure Brush.App exists before assignment
+  (window as any).Brush = (window as any).Brush || {};
+  (window as any).Brush.App = (window as any).Brush.App || {};
+  (window as any).Brush.App.version = { id: version, isNew };
+
+  if (isNew) Cookies.set(COOKIE_NAME, version);
 };
 
 export default {

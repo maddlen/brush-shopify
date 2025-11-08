@@ -1,31 +1,28 @@
 export type ValidationErrors = Record<string, string[]>;
 
 class FormValidator {
-  private container: HTMLElement;
+  constructor(private readonly container: HTMLElement) {}
 
-  constructor(container: HTMLElement) {
-    this.container = container;
+  clearErrors(): void {
+    this.container.querySelectorAll("[validator-error]").forEach(el => el.remove());
   }
 
-  clearErrors() {
-    this.container.querySelectorAll("[validator-error]").forEach((el) => el.remove());
-  }
+  showErrors(errors: ValidationErrors): void {
+    const fragment = document.createDocumentFragment();
 
-  showErrors(errors: ValidationErrors) {
-    for (const [field, messages] of Object.entries(errors)) {
+    for (const [field, [message]] of Object.entries(errors)) {
       const input = this.container.querySelector<HTMLElement>(`[validator-field="${field}"]`);
+      if (!input) continue;
 
-      if (input) {
-        // Create error message element
-        const error = document.createElement("span");
-        error.textContent = $t(messages[0]);
-        error.setAttribute("validator-error", "");
-
-        // Insert error message after input
-        input.insertAdjacentElement("afterend", error);
-      }
+      const error = document.createElement("span");
+      error.textContent = $t(message);
+      error.setAttribute("validator-error", "");
+      input.insertAdjacentElement("afterend", error);
     }
+
+    // Using a DocumentFragment ensures future scalability if you ever need bulk insertions.
+    this.container.appendChild(fragment);
   }
 }
 
-export default { FormValidator };
+export default FormValidator;
