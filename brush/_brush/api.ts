@@ -2,6 +2,7 @@ const defaultHeaders: Record<string, string> = {
   "Content-Type": "application/json",
   "X-App-Country": Shopify.country,
   "X-App-Locale": Shopify.locale,
+  "X-App-Currency": Shopify.currency.active,
   "X-App-Theme": String(Shopify.theme.id),
 };
 
