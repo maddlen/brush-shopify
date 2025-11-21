@@ -4,11 +4,10 @@ const makeLoginRedirectUrl = (path = ""): string => {
   const currentUrl = new URL(window.location.href);
   const basePath = Shopify.routes.root.replace(/\/$/, "");
   const returnPath = path || `${currentUrl.pathname}${currentUrl.search}`.replace(basePath, "");
-  const returnTo = `${basePath}/${returnPath}`.replace(/\/{2,}/g, "/");
+  const returnTo = `${basePath}/${returnPath}/?country=${Shopify.country}`.replace(/\/{2,}/g, "/");
 
-  return `${currentUrl.origin}/customer_authentication/login?return_to=${encodeURIComponent(returnTo)}`;
+  return `${currentUrl.origin}/customer_authentication/login?return_to=${encodeURIComponent(returnTo)}&locale=${Shopify.locale}`;
 };
-
 
 class Referrer {
   cookieName = "brush_referrer";
