@@ -6,11 +6,15 @@ const defaultHeaders: Record<string, string> = {
   "X-App-Theme": String(Shopify.theme.id),
 };
 
-export async function ggtFetch<T = any>(input: RequestInfo, init?: RequestInit): Promise<T | Blob> {
+const APP_PREFIX = "apps/brush/";
+
+export async function ggtFetch<T = any>(input: string, init?: RequestInit): Promise<T | Blob> {
   const headers = {
     ...defaultHeaders,
     ...(init?.headers || {}),
   };
+
+  input = `/${APP_PREFIX}${input.replace(APP_PREFIX, "").replace(/^\//, "")}`;
 
   const response = await fetch(input, {
     ...init,

@@ -12,7 +12,7 @@ const init = async (): Promise<void> => {
     if (!Brush.App.version.isNew && cached) {
       translations = JSON.parse(cached);
     } else {
-      const response = await ggtFetch(`/apps/brush/i18n`);
+      const response = await ggtFetch("i18n");
       translations = typeof response === "string" ? JSON.parse(response) : response || {};
       localStorage.setItem(key, JSON.stringify(translations));
     }
