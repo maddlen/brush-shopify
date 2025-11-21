@@ -4,7 +4,7 @@ class FormValidator {
   constructor(private readonly container: HTMLElement) {}
 
   clearErrors(): void {
-    this.container.querySelectorAll("[validator-error]").forEach(el => el.remove());
+    this.container.querySelectorAll("[validator-error]").forEach((el) => el.remove());
   }
 
   showErrors(errors: ValidationErrors): void {
@@ -25,4 +25,6 @@ class FormValidator {
   }
 }
 
-export default FormValidator;
+export default {
+  Validator: FormValidator,
+};
