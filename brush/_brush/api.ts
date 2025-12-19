@@ -14,7 +14,7 @@ export async function ggtFetch<T = any>(input: string, init?: RequestInit): Prom
     ...(init?.headers || {}),
   };
 
-  input = `/${APP_PREFIX}${input.replace(APP_PREFIX, "").replace(/^\//, "")}`;
+  input = `${Shopify.routes.root}${APP_PREFIX}${input.replace(APP_PREFIX, "").replace(/^\//, "")}`;
 
   const response = await fetch(input, {
     ...init,
