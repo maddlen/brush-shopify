@@ -8,7 +8,7 @@ const defaultHeaders: Record<string, string> = {
 
 const APP_PREFIX = "apps/brush/";
 
-export async function ggtFetch<T = any>(input: string, init?: RequestInit): Promise<T | Blob> {
+export async function ggtFetch<T = any>(input: string, init?: RequestInit): Promise<T> {
   const headers = {
     ...defaultHeaders,
     ...(init?.headers || {}),
@@ -30,10 +30,10 @@ export async function ggtFetch<T = any>(input: string, init?: RequestInit): Prom
   if (contentType.includes("application/json")) {
     return response.json();
   } else if (contentType.includes("application/pdf")) {
-    return response.blob(); // returns a Blob for PDF
+    return response.blob() as T; // returns a Blob for PDF
   } else {
     // fallback to text for other types
-    return response.text() as unknown as T;
+    return response.text() as T;
   }
 }
 
